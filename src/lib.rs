@@ -1,13 +1,11 @@
-mod protos {
-    tonic::include_proto!("basalt");
-}
+pub mod basalt;
 
 #[cfg(feature = "client")]
 pub mod client {
-    pub use crate::protos::auth_client;
+    pub use crate::basalt::auth_client;
 }
 
 #[cfg(feature = "server")]
 pub mod server {
-    pub use crate::protos::auth_server;
+    pub use crate::basalt::auth_server;
 }

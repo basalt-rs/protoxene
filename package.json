@@ -1,6 +1,6 @@
 {
-    "name": "basalt-protos",
-    "version": "1.0.0",
+    "name": "protoxene",
+    "version": "0.1.0",
     "main": "ts-protos/index.js",
     "types": "ts-protos/index.d.ts",
     "scripts": {
