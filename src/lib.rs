@@ -1,1 +1,3 @@
-tonic::include_proto!("basalt");
+pub mod protos {
+    tonic::include_proto!("basalt");
+}
