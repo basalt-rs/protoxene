@@ -2,6 +2,7 @@ build-rust:
 	cargo build
 build-ts:
 	npm run gen-protos
+	npm run build
 build-go:
 	echo "Go protos not implemented"
 
