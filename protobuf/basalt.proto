@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package basalt;
+
+service Auth {
+    rpc login (LoginRequest) returns (LoginResponse);
+}
+
+message LoginRequest {
+    string name = 1;
+    string password = 2;
+}
+
+message LoginResponse {
+    string sessionToken = 1;
+}
