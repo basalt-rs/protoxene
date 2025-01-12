@@ -1,0 +1,12 @@
+version: v2
+#managed:
+#    enabled: true
+#    override:
+#        - file_option: go_package_prefix
+#          value: github.com/basalt-rs/protoxene
+plugins:
+    #- remote: buf.build/protocolbuffers/go
+    #  out: protoxene
+    - local: protoc-gen-es
+      opt: target=ts
+      out: ts-protos

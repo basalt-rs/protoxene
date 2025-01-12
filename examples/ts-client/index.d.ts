@@ -1,2 +1,2 @@
-export * from "./basalt_pb";
+export {};
 //# sourceMappingURL=index.d.ts.map
