@@ -1,6 +1,7 @@
 build-rust:
 	cargo build
 build-ts:
+	npm i
 	npm run gen-protos
 	npm run build
 build-go:
