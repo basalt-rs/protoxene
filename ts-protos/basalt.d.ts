@@ -1,28 +1,45 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import { grpc } from "@improbable-eng/grpc-web";
 export declare const protobufPackage = "basalt";
 export interface LoginRequest {
-    name: string;
-    password: string;
+    name?: string | undefined;
+    password?: string | undefined;
 }
 export interface LoginResponse {
-    sessionToken: string;
+    sessionToken?: string | undefined;
 }
 export declare const LoginRequest: MessageFns<LoginRequest>;
 export declare const LoginResponse: MessageFns<LoginResponse>;
 export interface Auth {
-    login(request: LoginRequest): Promise<LoginResponse>;
+    login(request: DeepPartial<LoginRequest>, metadata?: grpc.Metadata): Promise<LoginResponse>;
 }
-export declare const AuthServiceName = "basalt.Auth";
 export declare class AuthClientImpl implements Auth {
     private readonly rpc;
-    private readonly service;
-    constructor(rpc: Rpc, opts?: {
-        service?: string;
-    });
-    login(request: LoginRequest): Promise<LoginResponse>;
+    constructor(rpc: Rpc);
+    login(request: DeepPartial<LoginRequest>, metadata?: grpc.Metadata): Promise<LoginResponse>;
 }
+export declare const AuthDesc: {
+    serviceName: string;
+};
+export declare const AuthloginDesc: UnaryMethodDefinitionish;
+interface UnaryMethodDefinitionishR extends grpc.UnaryMethodDefinition<any, any> {
+    requestStream: any;
+    responseStream: any;
+}
+type UnaryMethodDefinitionish = UnaryMethodDefinitionishR;
 interface Rpc {
-    request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
+    unary<T extends UnaryMethodDefinitionish>(methodDesc: T, request: any, metadata: grpc.Metadata | undefined): Promise<any>;
+}
+export declare class GrpcWebImpl {
+    private host;
+    private options;
+    constructor(host: string, options: {
+        transport?: grpc.TransportFactory;
+        debug?: boolean;
+        metadata?: grpc.Metadata;
+        upStreamRetryCodes?: number[];
+    });
+    unary<T extends UnaryMethodDefinitionish>(methodDesc: T, _request: any, metadata: grpc.Metadata | undefined): Promise<any>;
 }
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 export type DeepPartial<T> = T extends Builtin ? T : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>> : T extends {} ? {
@@ -34,6 +51,11 @@ export type Exact<P, I extends P> = P extends Builtin ? P : P & {
 } & {
     [K in Exclude<keyof I, KeysOfUnion<P>>]: never;
 };
+export declare class GrpcWebError extends globalThis.Error {
+    code: grpc.Code;
+    metadata: grpc.Metadata;
+    constructor(message: string, code: grpc.Code, metadata: grpc.Metadata);
+}
 export interface MessageFns<T> {
     encode(message: T, writer?: BinaryWriter): BinaryWriter;
     decode(input: BinaryReader | Uint8Array, length?: number): T;

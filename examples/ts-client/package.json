@@ -1,18 +1,22 @@
 {
-  "name": "ts-client-example",
-  "module": "index.ts",
-  "type": "module",
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
-  "dependencies": {
-    "@bufbuild/protobuf": "^2.2.3",
-    "protoxene": "github:basalt-rs/protoxene#2dce85e"
-  },
-  "trustedDependencies": [
-    "protoxene"
-  ]
+    "name": "ts-client-example",
+    "module": "index.ts",
+    "type": "module",
+    "devDependencies": {
+        "@types/bun": "latest"
+    },
+    "peerDependencies": {
+        "typescript": "^5.0.0"
+    },
+    "dependencies": {
+        "@bufbuild/protobuf": "^2.2.3",
+        "@protobuf-ts/grpc-transport": "^2.9.4",
+        "@protobuf-ts/runtime-rpc": "^2.9.4",
+        "grpc": "^1.24.11",
+        "nice-grpc": "^2.1.10",
+        "protoxene": "github:basalt-rs/protoxene#34d2198"
+    },
+    "trustedDependencies": [
+        "protoxene"
+    ]
 }

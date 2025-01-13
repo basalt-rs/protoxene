@@ -5,19 +5,21 @@
 //   protoc               unknown
 // source: basalt.proto
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthClientImpl = exports.AuthServiceName = exports.LoginResponse = exports.LoginRequest = exports.protobufPackage = void 0;
+exports.GrpcWebError = exports.GrpcWebImpl = exports.AuthloginDesc = exports.AuthDesc = exports.AuthClientImpl = exports.LoginResponse = exports.LoginRequest = exports.protobufPackage = void 0;
 /* eslint-disable */
 const wire_1 = require("@bufbuild/protobuf/wire");
+const grpc_web_1 = require("@improbable-eng/grpc-web");
+const browser_headers_1 = require("browser-headers");
 exports.protobufPackage = "basalt";
 function createBaseLoginRequest() {
     return { name: "", password: "" };
 }
 exports.LoginRequest = {
     encode(message, writer = new wire_1.BinaryWriter()) {
-        if (message.name !== "") {
+        if (message.name !== undefined && message.name !== "") {
             writer.uint32(10).string(message.name);
         }
-        if (message.password !== "") {
+        if (message.password !== undefined && message.password !== "") {
             writer.uint32(18).string(message.password);
         }
         return writer;
@@ -59,10 +61,10 @@ exports.LoginRequest = {
     },
     toJSON(message) {
         const obj = {};
-        if (message.name !== "") {
+        if (message.name !== undefined && message.name !== "") {
             obj.name = message.name;
         }
-        if (message.password !== "") {
+        if (message.password !== undefined && message.password !== "") {
             obj.password = message.password;
         }
         return obj;
@@ -83,7 +85,7 @@ function createBaseLoginResponse() {
 }
 exports.LoginResponse = {
     encode(message, writer = new wire_1.BinaryWriter()) {
-        if (message.sessionToken !== "") {
+        if (message.sessionToken !== undefined && message.sessionToken !== "") {
             writer.uint32(10).string(message.sessionToken);
         }
         return writer;
@@ -115,7 +117,7 @@ exports.LoginResponse = {
     },
     toJSON(message) {
         const obj = {};
-        if (message.sessionToken !== "") {
+        if (message.sessionToken !== undefined && message.sessionToken !== "") {
             obj.sessionToken = message.sessionToken;
         }
         return obj;
@@ -130,21 +132,71 @@ exports.LoginResponse = {
         return message;
     },
 };
-exports.AuthServiceName = "basalt.Auth";
 class AuthClientImpl {
-    constructor(rpc, opts) {
-        this.service = (opts === null || opts === void 0 ? void 0 : opts.service) || exports.AuthServiceName;
+    constructor(rpc) {
         this.rpc = rpc;
         this.login = this.login.bind(this);
     }
-    login(request) {
-        const data = exports.LoginRequest.encode(request).finish();
-        const promise = this.rpc.request(this.service, "login", data);
-        return promise.then((data) => exports.LoginResponse.decode(new wire_1.BinaryReader(data)));
+    login(request, metadata) {
+        return this.rpc.unary(exports.AuthloginDesc, exports.LoginRequest.fromPartial(request), metadata);
     }
 }
 exports.AuthClientImpl = AuthClientImpl;
+exports.AuthDesc = { serviceName: "basalt.Auth" };
+exports.AuthloginDesc = {
+    methodName: "login",
+    service: exports.AuthDesc,
+    requestStream: false,
+    responseStream: false,
+    requestType: {
+        serializeBinary() {
+            return exports.LoginRequest.encode(this).finish();
+        },
+    },
+    responseType: {
+        deserializeBinary(data) {
+            const value = exports.LoginResponse.decode(data);
+            return Object.assign(Object.assign({}, value), { toObject() {
+                    return value;
+                } });
+        },
+    },
+};
+class GrpcWebImpl {
+    constructor(host, options) {
+        this.host = host;
+        this.options = options;
+    }
+    unary(methodDesc, _request, metadata) {
+        var _a;
+        const request = Object.assign(Object.assign({}, _request), methodDesc.requestType);
+        const maybeCombinedMetadata = metadata && this.options.metadata
+            ? new browser_headers_1.BrowserHeaders(Object.assign(Object.assign({}, (_a = this.options) === null || _a === void 0 ? void 0 : _a.metadata.headersMap), metadata === null || metadata === void 0 ? void 0 : metadata.headersMap))
+            : metadata !== null && metadata !== void 0 ? metadata : this.options.metadata;
+        return new Promise((resolve, reject) => {
+            var _a;
+            grpc_web_1.grpc.unary(methodDesc, Object.assign(Object.assign({ request, host: this.host, metadata: maybeCombinedMetadata !== null && maybeCombinedMetadata !== void 0 ? maybeCombinedMetadata : {} }, (this.options.transport !== undefined ? { transport: this.options.transport } : {})), { debug: (_a = this.options.debug) !== null && _a !== void 0 ? _a : false, onEnd: function (response) {
+                    if (response.status === grpc_web_1.grpc.Code.OK) {
+                        resolve(response.message.toObject());
+                    }
+                    else {
+                        const err = new GrpcWebError(response.statusMessage, response.status, response.trailers);
+                        reject(err);
+                    }
+                } }));
+        });
+    }
+}
+exports.GrpcWebImpl = GrpcWebImpl;
 function isSet(value) {
     return value !== null && value !== undefined;
 }
+class GrpcWebError extends globalThis.Error {
+    constructor(message, code, metadata) {
+        super(message);
+        this.code = code;
+        this.metadata = metadata;
+    }
+}
+exports.GrpcWebError = GrpcWebError;
 //# sourceMappingURL=basalt.js.map

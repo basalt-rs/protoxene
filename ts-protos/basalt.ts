@@ -6,16 +6,18 @@
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import { grpc } from "@improbable-eng/grpc-web";
+import { BrowserHeaders } from "browser-headers";
 
 export const protobufPackage = "basalt";
 
 export interface LoginRequest {
-  name: string;
-  password: string;
+  name?: string | undefined;
+  password?: string | undefined;
 }
 
 export interface LoginResponse {
-  sessionToken: string;
+  sessionToken?: string | undefined;
 }
 
 function createBaseLoginRequest(): LoginRequest {
@@ -24,10 +26,10 @@ function createBaseLoginRequest(): LoginRequest {
 
 export const LoginRequest: MessageFns<LoginRequest> = {
   encode(message: LoginRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.name !== "") {
+    if (message.name !== undefined && message.name !== "") {
       writer.uint32(10).string(message.name);
     }
-    if (message.password !== "") {
+    if (message.password !== undefined && message.password !== "") {
       writer.uint32(18).string(message.password);
     }
     return writer;
@@ -74,10 +76,10 @@ export const LoginRequest: MessageFns<LoginRequest> = {
 
   toJSON(message: LoginRequest): unknown {
     const obj: any = {};
-    if (message.name !== "") {
+    if (message.name !== undefined && message.name !== "") {
       obj.name = message.name;
     }
-    if (message.password !== "") {
+    if (message.password !== undefined && message.password !== "") {
       obj.password = message.password;
     }
     return obj;
@@ -100,7 +102,7 @@ function createBaseLoginResponse(): LoginResponse {
 
 export const LoginResponse: MessageFns<LoginResponse> = {
   encode(message: LoginResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.sessionToken !== "") {
+    if (message.sessionToken !== undefined && message.sessionToken !== "") {
       writer.uint32(10).string(message.sessionToken);
     }
     return writer;
@@ -136,7 +138,7 @@ export const LoginResponse: MessageFns<LoginResponse> = {
 
   toJSON(message: LoginResponse): unknown {
     const obj: any = {};
-    if (message.sessionToken !== "") {
+    if (message.sessionToken !== undefined && message.sessionToken !== "") {
       obj.sessionToken = message.sessionToken;
     }
     return obj;
@@ -153,27 +155,113 @@ export const LoginResponse: MessageFns<LoginResponse> = {
 };
 
 export interface Auth {
-  login(request: LoginRequest): Promise<LoginResponse>;
+  login(request: DeepPartial<LoginRequest>, metadata?: grpc.Metadata): Promise<LoginResponse>;
 }
 
-export const AuthServiceName = "basalt.Auth";
 export class AuthClientImpl implements Auth {
   private readonly rpc: Rpc;
-  private readonly service: string;
-  constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || AuthServiceName;
+
+  constructor(rpc: Rpc) {
     this.rpc = rpc;
     this.login = this.login.bind(this);
   }
-  login(request: LoginRequest): Promise<LoginResponse> {
-    const data = LoginRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "login", data);
-    return promise.then((data) => LoginResponse.decode(new BinaryReader(data)));
+
+  login(request: DeepPartial<LoginRequest>, metadata?: grpc.Metadata): Promise<LoginResponse> {
+    return this.rpc.unary(AuthloginDesc, LoginRequest.fromPartial(request), metadata);
   }
 }
 
+export const AuthDesc = { serviceName: "basalt.Auth" };
+
+export const AuthloginDesc: UnaryMethodDefinitionish = {
+  methodName: "login",
+  service: AuthDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: {
+    serializeBinary() {
+      return LoginRequest.encode(this).finish();
+    },
+  } as any,
+  responseType: {
+    deserializeBinary(data: Uint8Array) {
+      const value = LoginResponse.decode(data);
+      return {
+        ...value,
+        toObject() {
+          return value;
+        },
+      };
+    },
+  } as any,
+};
+
+interface UnaryMethodDefinitionishR extends grpc.UnaryMethodDefinition<any, any> {
+  requestStream: any;
+  responseStream: any;
+}
+
+type UnaryMethodDefinitionish = UnaryMethodDefinitionishR;
+
 interface Rpc {
-  request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
+  unary<T extends UnaryMethodDefinitionish>(
+    methodDesc: T,
+    request: any,
+    metadata: grpc.Metadata | undefined,
+  ): Promise<any>;
+}
+
+export class GrpcWebImpl {
+  private host: string;
+  private options: {
+    transport?: grpc.TransportFactory;
+
+    debug?: boolean;
+    metadata?: grpc.Metadata;
+    upStreamRetryCodes?: number[];
+  };
+
+  constructor(
+    host: string,
+    options: {
+      transport?: grpc.TransportFactory;
+
+      debug?: boolean;
+      metadata?: grpc.Metadata;
+      upStreamRetryCodes?: number[];
+    },
+  ) {
+    this.host = host;
+    this.options = options;
+  }
+
+  unary<T extends UnaryMethodDefinitionish>(
+    methodDesc: T,
+    _request: any,
+    metadata: grpc.Metadata | undefined,
+  ): Promise<any> {
+    const request = { ..._request, ...methodDesc.requestType };
+    const maybeCombinedMetadata = metadata && this.options.metadata
+      ? new BrowserHeaders({ ...this.options?.metadata.headersMap, ...metadata?.headersMap })
+      : metadata ?? this.options.metadata;
+    return new Promise((resolve, reject) => {
+      grpc.unary(methodDesc, {
+        request,
+        host: this.host,
+        metadata: maybeCombinedMetadata ?? {},
+        ...(this.options.transport !== undefined ? { transport: this.options.transport } : {}),
+        debug: this.options.debug ?? false,
+        onEnd: function (response) {
+          if (response.status === grpc.Code.OK) {
+            resolve(response.message!.toObject());
+          } else {
+            const err = new GrpcWebError(response.statusMessage, response.status, response.trailers);
+            reject(err);
+          }
+        },
+      });
+    });
+  }
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
@@ -190,6 +278,12 @@ export type Exact<P, I extends P> = P extends Builtin ? P
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;
+}
+
+export class GrpcWebError extends globalThis.Error {
+  constructor(message: string, public code: grpc.Code, public metadata: grpc.Metadata) {
+    super(message);
+  }
 }
 
 export interface MessageFns<T> {

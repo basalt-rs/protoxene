@@ -1,6 +1,13 @@
-version: v1
+version: v2
+managed:
+    enabled: true
 plugins:
-    - name: ts
-      out: ./ts-protos
+    - out: ./ts-protos
       strategy: all
-      path: ./node_modules/ts-proto/protoc-gen-ts_proto
+      local: protoc-gen-ts_proto
+      opt:
+          - useExactTypes=true
+          - useOptionals=all
+          - outputClientImpl=grpc-web
+inputs:
+    - directory: ./protobuf
