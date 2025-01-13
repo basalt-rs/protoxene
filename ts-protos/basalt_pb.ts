@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file basalt.proto.
  */
 export const file_basalt: GenFile = /*@__PURE__*/
-  fileDesc("CgxiYXNhbHQucHJvdG8SBmJhc2FsdCIuCgxMb2dpblJlcXVlc3QSDAoEbmFtZRgBIAEoCRIQCghwYXNzd29yZBgCIAEoCSIlCg1Mb2dpblJlc3BvbnNlEhQKDHNlc3Npb25Ub2tlbhgBIAEoCTI8CgRBdXRoEjQKBWxvZ2luEhQuYmFzYWx0LkxvZ2luUmVxdWVzdBoVLmJhc2FsdC5Mb2dpblJlc3BvbnNlYgZwcm90bzM");
+  fileDesc("CgxiYXNhbHQucHJvdG8SBmJhc2FsdCIuCgxMb2dpblJlcXVlc3QSDAoEbmFtZRgBIAEoCRIQCghwYXNzd29yZBgCIAEoCSIlCg1Mb2dpblJlc3BvbnNlEhQKDHNlc3Npb25Ub2tlbhgBIAEoCTI8CgRBdXRoEjQKBWxvZ2luEhQuYmFzYWx0LkxvZ2luUmVxdWVzdBoVLmJhc2FsdC5Mb2dpblJlc3BvbnNlQlEKCmNvbS5iYXNhbHRCC0Jhc2FsdFByb3RvUAGiAgNCWFiqAgZCYXNhbHTKAgZCYXNhbHTiAhJCYXNhbHRcR1BCTWV0YWRhdGHqAgZCYXNhbHRiBnByb3RvMw");
 
 /**
  * @generated from message basalt.LoginRequest

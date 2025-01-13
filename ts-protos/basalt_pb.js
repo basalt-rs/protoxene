@@ -8,7 +8,7 @@ const codegenv1_1 = require("@bufbuild/protobuf/codegenv1");
 /**
  * Describes the file basalt.proto.
  */
-exports.file_basalt = (0, codegenv1_1.fileDesc)("CgxiYXNhbHQucHJvdG8SBmJhc2FsdCIuCgxMb2dpblJlcXVlc3QSDAoEbmFtZRgBIAEoCRIQCghwYXNzd29yZBgCIAEoCSIlCg1Mb2dpblJlc3BvbnNlEhQKDHNlc3Npb25Ub2tlbhgBIAEoCTI8CgRBdXRoEjQKBWxvZ2luEhQuYmFzYWx0LkxvZ2luUmVxdWVzdBoVLmJhc2FsdC5Mb2dpblJlc3BvbnNlYgZwcm90bzM");
+exports.file_basalt = (0, codegenv1_1.fileDesc)("CgxiYXNhbHQucHJvdG8SBmJhc2FsdCIuCgxMb2dpblJlcXVlc3QSDAoEbmFtZRgBIAEoCRIQCghwYXNzd29yZBgCIAEoCSIlCg1Mb2dpblJlc3BvbnNlEhQKDHNlc3Npb25Ub2tlbhgBIAEoCTI8CgRBdXRoEjQKBWxvZ2luEhQuYmFzYWx0LkxvZ2luUmVxdWVzdBoVLmJhc2FsdC5Mb2dpblJlc3BvbnNlQlEKCmNvbS5iYXNhbHRCC0Jhc2FsdFByb3RvUAGiAgNCWFiqAgZCYXNhbHTKAgZCYXNhbHTiAhJCYXNhbHRcR1BCTWV0YWRhdGHqAgZCYXNhbHRiBnByb3RvMw");
 /**
  * Describes the message basalt.LoginRequest.
  * Use `create(LoginRequestSchema)` to create a new message.
