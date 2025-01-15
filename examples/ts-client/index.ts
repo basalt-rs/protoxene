@@ -1,9 +1,15 @@
-import { AuthClientImpl, LoginRequest } from "protoxene";
-import { create } from "@bufbuild/protobuf";
-import * as grpc from "grpc";
-import type { UnaryCallback } from "@grpc/grpc-js/build/src/client";
+import { AuthClientImpl, GrpcWebImpl } from "protoxene";
 import { createChannel, createClient } from "nice-grpc";
 
-const conn = createChannel("localhost:8080");
+const impl = new GrpcWebImpl("http://localhost:8080", { debug: true });
 
-const client = createClient(AuthClientImpl, channel);
+const authService = new AuthClientImpl(impl);
+
+try {
+    const response = await authService.login({
+        name: "username",
+        password: "password",
+    });
+} catch (e) {
+    console.log(e);
+}

@@ -9,5 +9,7 @@ plugins:
           - useExactTypes=true
           - useOptionals=all
           - outputClientImpl=grpc-web
+          - importStyle=commonjs+dts
+          - mode=grpcwebtext
 inputs:
     - directory: ./protobuf
