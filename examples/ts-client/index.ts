@@ -1,5 +1,4 @@
-import { LoginRequest } from "../../ts-protos/basalt_pb";
-import { AuthClient } from "../../ts-protos/BasaltServiceClientPb";
+import { LoginRequest, AuthClient } from "protoxene";
 
 const authService = new AuthClient("http://localhost:9090");
 

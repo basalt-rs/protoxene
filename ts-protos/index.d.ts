@@ -1,3 +1,3 @@
+export * from "./basalt_grpc_web_pb";
 export * from "./basalt_pb";
-export * from "./BasaltServiceClientPb";
 //# sourceMappingURL=index.d.ts.map

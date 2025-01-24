@@ -6,7 +6,7 @@ plugins:
       strategy: all
       local: protoc-gen-grpc-web
       opt:
-          - import_style=typescript
+          - import_style=commonjs+dts
           - mode=grpcwebtext
 inputs:
     - directory: ./protobuf
