@@ -1,1 +1,2 @@
-export * from "./basalt";
+export * from "./basalt_pb";
+export * from "./BasaltServiceClientPb";

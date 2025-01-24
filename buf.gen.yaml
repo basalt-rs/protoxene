@@ -4,12 +4,9 @@ managed:
 plugins:
     - out: ./ts-protos
       strategy: all
-      local: protoc-gen-ts_proto
+      local: protoc-gen-grpc-web
       opt:
-          - useExactTypes=true
-          - useOptionals=all
-          - outputClientImpl=grpc-web
-          - importStyle=commonjs+dts
+          - import_style=typescript
           - mode=grpcwebtext
 inputs:
     - directory: ./protobuf

@@ -22,7 +22,9 @@
         "@grpc/proto-loader": "^0.7.13",
         "grpc_tools_node_protoc_ts": "^5.3.3",
         "grpc-tools": "^1.12.4",
+        "grpc-web": "^1.5.0",
         "husky": "^9.1.7",
+        "protoc-gen-grpc-web": "^1.5.0",
         "ts-node": "^10.9.2",
         "ts-proto": "^2.6.1",
         "typescript": "^5.7.3"
